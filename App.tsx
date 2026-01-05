@@ -10,6 +10,7 @@ import ExpenseForm from './components/ExpenseForm';
 import ExpenseList from './components/ExpenseList';
 import Settlements from './components/Settlements';
 import IndividualBoard from './components/IndividualBoard';
+import ScrollProgress from './components/ScrollProgress';
 
 const App: React.FC = () => {
   const [userName, setUserName] = useState<string | null>(localStorage.getItem('trip_user_name'));
@@ -178,6 +179,8 @@ const App: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-[#1a0a00] to-black pb-20 relative overflow-hidden">
+      <ScrollProgress />
+      
       {/* Animated background orbs */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-[#f49221] rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob"></div>

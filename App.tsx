@@ -9,6 +9,7 @@ import TripManager from './components/TripManager';
 import ExpenseForm from './components/ExpenseForm';
 import ExpenseList from './components/ExpenseList';
 import Settlements from './components/Settlements';
+import IndividualBoard from './components/IndividualBoard';
 
 const App: React.FC = () => {
   const [userName, setUserName] = useState<string | null>(localStorage.getItem('trip_user_name'));
@@ -20,6 +21,7 @@ const App: React.FC = () => {
   const [copied, setCopied] = useState(false);
   const [dbError, setDbError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [selectedPerson, setSelectedPerson] = useState<string | null>(null);
 
   // Calculate balances
   const balances: Balance[] = useMemo(() => {
@@ -186,7 +188,7 @@ const App: React.FC = () => {
       <header className="sticky top-0 z-50 backdrop-blur-xl bg-gradient-to-r from-[#f49221]/80 to-[#e58515]/80 border-b border-white/10 shadow-2xl shadow-[#f49221]/20">
         <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <img src="/pics/manas.png" alt="Manas Split Logo" className="w-10 h-10 rounded-xl shadow-lg hover:scale-110 transition-transform object-cover" />
+            <img src={`${import.meta.env.BASE_URL}pics/manas.png`} alt="Manas Split Logo" className="w-10 h-10 rounded-xl shadow-lg hover:scale-110 transition-transform object-cover" />
             <h1 className="text-xl font-bold text-white tracking-tight">Manas Split</h1>
           </div>
           
@@ -241,7 +243,11 @@ const App: React.FC = () => {
           
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             {balances.map(balance => (
-              <div key={balance.name} className="group relative backdrop-blur-xl bg-gradient-to-br from-white/10 to-white/5 border border-white/20 rounded-2xl p-6 hover:border-[#f49221]/50 transition-all hover:shadow-2xl hover:shadow-[#f49221]/30 hover:scale-105 duration-300">
+              <div 
+                key={balance.name} 
+                className="group relative backdrop-blur-xl bg-gradient-to-br from-white/10 to-white/5 border border-white/20 rounded-2xl p-6 hover:border-[#f49221]/50 transition-all hover:shadow-2xl hover:shadow-[#f49221]/30 hover:scale-105 duration-300 cursor-pointer"
+                onClick={() => setSelectedPerson(balance.name)}
+              >
                 <div className="absolute inset-0 bg-gradient-to-br from-[#f49221]/10 to-transparent rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity"></div>
                 <div className="relative z-10">
                   <div className="flex items-start justify-between mb-4">
@@ -326,6 +332,16 @@ const App: React.FC = () => {
           tripId={trip.id}
           participants={trip.participants}
           onClose={() => setShowForm(false)} 
+        />
+      )}
+
+      {selectedPerson && trip && (
+        <IndividualBoard
+          person={selectedPerson}
+          balances={balances}
+          expenses={expenses}
+          trip={trip}
+          onClose={() => setSelectedPerson(null)}
         />
       )}
     </div>

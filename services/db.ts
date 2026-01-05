@@ -148,6 +148,15 @@ export const markSettlementAsPaid = async (settlementId: string, proofImageUrl?:
   await updateDoc(docRef, updateData);
 };
 
+export const setSettlementPaidStatus = async (settlementId: string, isPaid: boolean): Promise<void> => {
+  const docRef = doc(db, SETTLEMENTS_COLLECTION, settlementId);
+  const updateData: any = {
+    isPaid,
+    paidAt: isPaid ? Date.now() : null
+  };
+  await updateDoc(docRef, updateData);
+};
+
 export const deleteSettlement = async (settlementId: string): Promise<void> => {
   const docRef = doc(db, SETTLEMENTS_COLLECTION, settlementId);
   await deleteDoc(docRef);

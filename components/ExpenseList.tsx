@@ -1,13 +1,29 @@
 
 import React, { useState } from 'react';
-import { Expense } from '../types';
+import { Expense, Trip } from '../types';
+import { AVATARS } from '../assets/avatars';
+import { RupeeSymbol } from './CurrencyIcon';
 
 interface ExpenseListProps {
   expenses: Expense[];
+  trip?: Trip;
 }
 
-const ExpenseList: React.FC<ExpenseListProps> = ({ expenses }) => {
+const ExpenseList: React.FC<ExpenseListProps> = ({ expenses, trip }) => {
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
+
+  const renderAvatar = (name: string) => {
+    const avatarId = trip?.memberAvatars?.[name];
+    const avatar = AVATARS.find(a => a.id === avatarId);
+    if (avatar?.image) {
+      return <img src={avatar.image} alt={name} className="w-6 h-6 rounded-full object-cover" />;
+    }
+    return (
+      <div className="w-6 h-6 bg-[#f49221]/30 rounded-full flex items-center justify-center text-[#f49221] font-bold text-xs">
+        {name[0]}
+      </div>
+    );
+  };
 
   return (
     <div className="space-y-6">
@@ -30,17 +46,22 @@ const ExpenseList: React.FC<ExpenseListProps> = ({ expenses }) => {
                     <div className="font-bold text-white text-base">{exp.title}</div>
                     <div className="text-xs text-gray-500 mt-1">{new Date(exp.createdAt).toLocaleDateString()}</div>
                   </td>
-                  <td className="px-6 py-5 font-bold text-lg text-white">₹{exp.amount.toFixed(2)}</td>
+                  <td className="px-6 py-5 font-bold text-lg text-white"><RupeeSymbol className="mr-1" />{exp.amount.toFixed(2)}</td>
                   <td className="px-6 py-5">
-                    <div className="text-gray-300 font-medium">{exp.paidBy}</div>
-                    <div className="text-xs text-gray-600">({exp.paymentMethod})</div>
+                    <div className="flex items-center gap-2">
+                      {renderAvatar(exp.paidBy)}
+                      <div>
+                        <div className="text-gray-300 font-medium">{exp.paidBy}</div>
+                        <div className="text-xs text-gray-600">({exp.paymentMethod})</div>
+                      </div>
+                    </div>
                   </td>
                   <td className="px-6 py-5">
                     <div className="text-gray-300 font-medium text-sm">{exp.splitBetween.length} person{exp.splitBetween.length !== 1 ? 's' : ''}</div>
                     {exp.splitType === 'custom' ? (
                       <div className="text-xs text-purple-400 font-bold mt-1">CUSTOM SPLIT</div>
                     ) : (
-                      <div className="text-xs text-[#f49221] font-bold mt-1">₹{exp.perPersonAmount.toFixed(2)} each</div>
+                      <div className="text-xs text-[#f49221] font-bold mt-1"><RupeeSymbol />{exp.perPersonAmount.toFixed(2)} each</div>
                     )}
                   </td>
                   <td className="px-6 py-5">

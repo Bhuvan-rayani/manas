@@ -1,15 +1,48 @@
 
 import React, { useState, useMemo } from 'react';
-import { PaymentMethod, SplitType } from '../types';
+import { PaymentMethod, SplitType, Trip } from '../types';
 import { createExpense } from '../services/db';
+import { AVATARS } from '../assets/avatars';
+import { RupeeSymbol } from './CurrencyIcon';
 
 interface ExpenseFormProps {
   tripId: string;
   participants: string[];
+  trip?: Trip;
   onClose: () => void;
 }
 
-const ExpenseForm: React.FC<ExpenseFormProps> = ({ tripId, participants, onClose }) => {
+const ExpenseForm: React.FC<ExpenseFormProps> = ({ tripId, participants, trip, onClose }) => {
+  
+  // Helper to render avatar with initials fallback
+  const renderAvatar = (name: string, size: 'sm' | 'md' = 'sm') => {
+    const sizeClass = size === 'sm' ? 'w-5 h-5 text-[8px]' : 'w-6 h-6 text-[10px]';
+    const borderClass = size === 'sm' ? 'border' : 'border-2';
+    
+    if (trip?.memberAvatars?.[name]) {
+      const avatar = AVATARS.find(a => a.id === trip.memberAvatars[name]);
+      if (avatar) {
+        return (
+          <img 
+            src={avatar.image} 
+            alt={name} 
+            className={`${sizeClass} rounded-full object-cover ${borderClass} border-white flex-shrink-0`}
+            onError={(e) => {
+              e.currentTarget.style.display = 'none';
+            }}
+          />
+        );
+      }
+    }
+    
+    // Fallback: show initials
+    const initials = name.split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2);
+    return (
+      <div className={`${sizeClass} rounded-full bg-[#f49221]/20 flex items-center justify-center font-bold text-[#f49221] flex-shrink-0`}>
+        {initials}
+      </div>
+    );
+  };
   const [title, setTitle] = useState('');
   const [amount, setAmount] = useState('');
   const [paidBy, setPaidBy] = useState('');
@@ -97,7 +130,7 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({ tripId, participants, onClose
               <input type="text" placeholder="e.g. Flight Tickets" className="w-full px-6 py-4 rounded-2xl border-2 border-gray-100 focus:border-[#f49221] outline-none font-bold text-black" value={title} onChange={e => setTitle(e.target.value)} />
             </div>
             <div>
-              <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2 block ml-1">Amount (INR)</label>
+              <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2 block ml-1">Amount (₹)</label>
               <input type="number" placeholder="0.00" className="w-full px-6 py-4 rounded-2xl border-2 border-gray-100 focus:border-[#f49221] outline-none font-bold text-black" value={amount} onChange={e => setAmount(e.target.value)} />
             </div>
           </div>
@@ -143,8 +176,9 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({ tripId, participants, onClose
             </div>
             <div className="grid grid-cols-2 gap-3 max-h-40 overflow-y-auto pr-2 custom-scrollbar">
               {participants.map(name => (
-                <label key={name} className={`flex items-center p-4 rounded-2xl border-2 cursor-pointer transition-all ${splitBetween.includes(name) ? 'bg-[#f49221]/10 border-[#f49221]' : 'bg-white border-gray-100'}`}>
+                <label key={name} className={`flex items-center gap-2 p-4 rounded-2xl border-2 cursor-pointer transition-all ${splitBetween.includes(name) ? 'bg-[#f49221]/10 border-[#f49221]' : 'bg-white border-gray-100'}`}>
                   <input type="checkbox" className="hidden" checked={splitBetween.includes(name)} onChange={() => setSplitBetween(s => s.includes(name) ? s.filter(x => x !== name) : [...s, name])} />
+                  {renderAvatar(name, 'sm')}
                   <span className={`text-xs font-black uppercase tracking-tight ${splitBetween.includes(name) ? 'text-black' : 'text-gray-400'}`}>{name}</span>
                 </label>
               ))}
@@ -157,9 +191,10 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({ tripId, participants, onClose
               <div className="space-y-3 max-h-52 overflow-y-auto pr-2">
                 {splitBetween.map(name => (
                   <div key={name} className="flex items-center gap-3 bg-gray-50 p-4 rounded-xl">
+                    {renderAvatar(name, 'md')}
                     <span className="text-sm font-bold text-black flex-1">{name}</span>
                     <div className="relative">
-                      <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 font-bold">₹</span>
+                      <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 font-bold"><RupeeSymbol /></span>
                       <input
                         type="number"
                         step="0.01"

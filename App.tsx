@@ -4,6 +4,7 @@ import { Trip, Expense, Balance, Settlement } from './types';
 import { subscribeToTrip, subscribeToExpenses, subscribeToSettlements } from './services/db';
 import { isFirebaseConfigured } from './firebase';
 import { AVATARS } from './assets/avatars';
+import { RupeeSymbol } from './components/CurrencyIcon';
 import Onboarding from './components/Onboarding';
 import TripManager from './components/TripManager';
 import ExpenseForm from './components/ExpenseForm';
@@ -273,11 +274,11 @@ const App: React.FC = () => {
                     </span>
                   </div>
                   <div className="text-4xl font-black bg-gradient-to-r from-[#f49221] via-[#ff9d3d] to-[#e58515] bg-clip-text text-transparent mb-3 drop-shadow-lg">
-                    ₹{Math.abs(balance.net).toFixed(2)}
+                    <RupeeSymbol className="mr-2" />{Math.abs(balance.net).toFixed(2)}
                   </div>
                   <div className="flex items-center gap-2 text-gray-300 text-sm">
                     <span className="w-2 h-2 bg-[#f49221] rounded-full animate-pulse"></span>
-                    Paid: <span className="text-[#f49221] font-bold">₹{balance.paid.toFixed(2)}</span>
+                    Paid: <span className="text-[#f49221] font-bold"><RupeeSymbol className="mr-1" />{balance.paid.toFixed(2)}</span>
                   </div>
                 </div>
               </div>
@@ -316,7 +317,7 @@ const App: React.FC = () => {
               </button>
             </div>
           ) : (
-            <ExpenseList expenses={expenses} />
+            <ExpenseList expenses={expenses} trip={trip} />
           )}
         </div>
       </main>
@@ -334,6 +335,7 @@ const App: React.FC = () => {
         <ExpenseForm 
           tripId={trip.id}
           participants={trip.participants}
+          trip={trip}
           onClose={() => setShowForm(false)} 
         />
       )}

@@ -2,6 +2,7 @@
 import React, { useState } from 'react';
 import { Expense, Balance } from '../types';
 import { getAIRecommendation } from '../services/ai';
+import { RupeeSymbol } from './CurrencyIcon';
 
 interface BalanceSummaryProps {
   participants: string[];
@@ -92,10 +93,10 @@ const BalanceSummary: React.FC<BalanceSummaryProps> = ({ participants, expenses 
               {balances.map(b => (
                 <tr key={b.name} className="hover:bg-gray-50/50 transition-colors">
                   <td className="px-8 py-6 font-bold text-black">{b.name}</td>
-                  <td className="px-8 py-6 text-gray-600 font-medium">₹{b.paid.toFixed(2)}</td>
-                  <td className="px-8 py-6 text-gray-600 font-medium">₹{b.owed.toFixed(2)}</td>
+                  <td className="px-8 py-6 text-gray-600 font-medium"><RupeeSymbol /> {b.paid.toFixed(2)}</td>
+                  <td className="px-8 py-6 text-gray-600 font-medium"><RupeeSymbol /> {b.owed.toFixed(2)}</td>
                   <td className={`px-8 py-6 font-black text-lg ${b.net > 0 ? 'text-green-600' : b.net < 0 ? 'text-[#f49221]' : 'text-gray-300'}`}>
-                    {b.net > 0 ? `+₹${b.net.toFixed(2)}` : b.net < 0 ? `-₹${Math.abs(b.net).toFixed(2)}` : 'SETTLED'}
+                    {b.net > 0 ? <><RupeeSymbol className="mr-1" /> +{b.net.toFixed(2)}</> : b.net < 0 ? <><RupeeSymbol className="mr-1" /> -{Math.abs(b.net).toFixed(2)}</> : 'SETTLED'}
                   </td>
                 </tr>
               ))}

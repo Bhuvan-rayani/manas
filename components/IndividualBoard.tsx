@@ -1,6 +1,7 @@
 import React from 'react';
 import { Balance, Expense, Trip } from '../types';
 import { AVATARS } from '../assets/avatars';
+import { RupeeSymbol } from './CurrencyIcon';
 
 interface IndividualBoardProps {
   person: string;
@@ -101,18 +102,18 @@ const IndividualBoard: React.FC<IndividualBoardProps> = ({ person, balances, exp
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div className="bg-gradient-to-br from-blue-900/50 to-blue-800/50 rounded-2xl p-6 border border-blue-700/50">
               <div className="text-blue-300 text-xs font-bold uppercase tracking-widest mb-2">Total Paid</div>
-              <div className="text-4xl font-black text-white">₹{currentBalance?.paid.toFixed(2)}</div>
+              <div className="text-4xl font-black text-white"><RupeeSymbol className="mr-2" />{currentBalance?.paid.toFixed(2)}</div>
             </div>
             <div className="bg-gradient-to-br from-purple-900/50 to-purple-800/50 rounded-2xl p-6 border border-purple-700/50">
               <div className="text-purple-300 text-xs font-bold uppercase tracking-widest mb-2">Fair Share</div>
-              <div className="text-4xl font-black text-white">₹{currentBalance?.owed.toFixed(2)}</div>
+              <div className="text-4xl font-black text-white"><RupeeSymbol className="mr-2" />{currentBalance?.owed.toFixed(2)}</div>
             </div>
             <div className={`bg-gradient-to-br ${currentBalance && currentBalance.net < 0 ? 'from-red-900/50 to-red-800/50 border-red-700/50' : currentBalance && currentBalance.net > 0 ? 'from-green-900/50 to-green-800/50 border-green-700/50' : 'from-gray-700/50 to-gray-600/50 border-gray-600/50'} rounded-2xl p-6 border`}>
               <div className={`text-xs font-bold uppercase tracking-widest mb-2 ${currentBalance && currentBalance.net < 0 ? 'text-red-300' : currentBalance && currentBalance.net > 0 ? 'text-green-300' : 'text-gray-400'}`}>
                 {currentBalance && currentBalance.net < 0 ? 'You Owe' : currentBalance && currentBalance.net > 0 ? 'You Get Back' : 'Status'}
               </div>
               <div className={`text-4xl font-black ${currentBalance && currentBalance.net < 0 ? 'text-red-400' : currentBalance && currentBalance.net > 0 ? 'text-green-400' : 'text-gray-400'}`}>
-                {currentBalance && Math.abs(currentBalance.net) > 0.01 ? `₹${Math.abs(currentBalance.net).toFixed(2)}` : 'Settled'}
+                {currentBalance && Math.abs(currentBalance.net) > 0.01 ? <><RupeeSymbol className="mr-2" />{Math.abs(currentBalance.net).toFixed(2)}</> : 'Settled'}
               </div>
             </div>
           </div>
@@ -156,7 +157,7 @@ const IndividualBoard: React.FC<IndividualBoardProps> = ({ person, balances, exp
                         </div>
                       </div>
                       <div className="bg-gradient-to-r from-red-600 to-red-700 text-white font-black px-6 py-3 rounded-xl text-2xl shadow-lg">
-                        ₹{txn.amount.toFixed(2)}
+                        <RupeeSymbol className="mr-2" />{txn.amount.toFixed(2)}
                       </div>
                     </div>
                   </div>
@@ -201,7 +202,7 @@ const IndividualBoard: React.FC<IndividualBoardProps> = ({ person, balances, exp
                         </div>
                       </div>
                       <div className="bg-gradient-to-r from-green-600 to-green-700 text-white font-black px-6 py-3 rounded-xl text-2xl shadow-lg">
-                        ₹{txn.amount.toFixed(2)}
+                        <RupeeSymbol className="mr-2" />{txn.amount.toFixed(2)}
                       </div>
                     </div>
                   </div>
@@ -250,10 +251,10 @@ const IndividualBoard: React.FC<IndividualBoardProps> = ({ person, balances, exp
                           </div>
                         </div>
                         <div className="text-right">
-                          <div className="text-white font-bold">₹{exp.amount.toFixed(2)}</div>
+                          <div className="text-white font-bold"><RupeeSymbol className="mr-1" />{exp.amount.toFixed(2)}</div>
                           {exp.splitBetween.includes(person) && (
                             <div className="text-[#f49221] text-xs font-bold">
-                              Your share: ₹{(exp.splitType === 'custom' && exp.customSplits && exp.customSplits[person] 
+                              Your share: <RupeeSymbol className="mr-1" />{(exp.splitType === 'custom' && exp.customSplits && exp.customSplits[person] 
                                 ? exp.customSplits[person] 
                                 : exp.perPersonAmount).toFixed(2)}
                             </div>

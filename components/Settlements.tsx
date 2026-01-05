@@ -2,6 +2,7 @@ import React, { useMemo, useState } from 'react';
 import { Balance, Settlement, Trip } from '../types';
 import { AVATARS } from '../assets/avatars';
 import { createSettlement, deleteSettlement, setSettlementPaidStatus } from '../services/db';
+import { RupeeSymbol } from './CurrencyIcon';
 
 interface SettlementsProps {
   balances: Balance[];
@@ -264,7 +265,7 @@ const Settlements: React.FC<SettlementsProps> = ({ balances, tripId, trackedSett
 
                   <div className="ml-6 flex items-center gap-3">
                     <div className="bg-[#f49221] text-white font-bold px-4 py-2 rounded-xl text-lg">
-                      ₹{settlement.amount.toFixed(2)}
+                      <RupeeSymbol className="mr-1" />{settlement.amount.toFixed(2)}
                     </div>
                     <div className="flex items-center gap-2">
                       <button
@@ -334,7 +335,7 @@ const Settlements: React.FC<SettlementsProps> = ({ balances, tripId, trackedSett
 
                     <div className="ml-6 flex items-center gap-3">
                       <div className="bg-[#f49221] text-white font-bold px-4 py-2 rounded-xl text-lg">
-                        ₹{txn.amount.toFixed(2)}
+                        <RupeeSymbol className="mr-1" />{txn.amount.toFixed(2)}
                       </div>
                       <button
                         onClick={() => handleCreateSettlement(txn)}
@@ -390,7 +391,7 @@ const Settlements: React.FC<SettlementsProps> = ({ balances, tripId, trackedSett
 
                   <div className="ml-6 flex items-center gap-3">
                     <div className="bg-green-700 text-white font-bold px-4 py-2 rounded-xl text-lg">
-                      ₹{settlement.amount.toFixed(2)}
+                      <RupeeSymbol className="mr-1" />{settlement.amount.toFixed(2)}
                     </div>
                     <button
                       onClick={() => handleTogglePaid(settlement.id, false)}

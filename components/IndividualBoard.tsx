@@ -1,60 +1,26 @@
 import React from 'react';
-import { Balance, Expense, Trip } from '../types';
+import { Balance, Expense, Settlement, Trip } from '../types';
 import { AVATARS } from '../assets/avatars';
 import { RupeeSymbol } from './CurrencyIcon';
+import { buildOutstandingTransactions, TransactionSuggestion } from '../services/settlements';
 
 interface IndividualBoardProps {
   person: string;
   balances: Balance[];
   expenses: Expense[];
+  settlements: Settlement[];
   trip: Trip;
   onClose: () => void;
 }
 
-interface PaymentDetail {
-  from: string;
-  to: string;
-  amount: number;
-}
-
-const IndividualBoard: React.FC<IndividualBoardProps> = ({ person, balances, expenses, trip, onClose }) => {
+const IndividualBoard: React.FC<IndividualBoardProps> = ({ person, balances, expenses, settlements, trip, onClose }) => {
   // Find the current person's balance
   const currentBalance = balances.find(b => b.name === person);
   
   // Calculate individual settlements (who this person owes or who owes them)
-  const calculateIndividualSettlements = (): PaymentDetail[] => {
-    const debtors = balances.filter(b => b.net < 0).map(b => ({ name: b.name, amount: Math.abs(b.net) }));
-    const creditors = balances.filter(b => b.net > 0).map(b => ({ name: b.name, amount: b.net }));
-    
-    const allTransactions: PaymentDetail[] = [];
-    
-    let i = 0, j = 0;
-    while (i < debtors.length && j < creditors.length) {
-      const debtor = debtors[i];
-      const creditor = creditors[j];
-      
-      const settleAmount = Math.min(debtor.amount, creditor.amount);
-      
-      if (settleAmount > 0.01) {
-        allTransactions.push({
-          from: debtor.name,
-          to: creditor.name,
-          amount: settleAmount
-        });
-      }
-      
-      debtor.amount -= settleAmount;
-      creditor.amount -= settleAmount;
-      
-      if (debtor.amount < 0.01) i++;
-      if (creditor.amount < 0.01) j++;
-    }
-    
-    // Filter transactions relevant to this person
-    return allTransactions.filter(t => t.from === person || t.to === person);
-  };
-
-  const personalTransactions = calculateIndividualSettlements();
+  const personalTransactions: TransactionSuggestion[] = React.useMemo(() => {
+    return buildOutstandingTransactions(expenses, settlements).filter(t => t.from === person || t.to === person);
+  }, [expenses, settlements, person]);
   const owesTransactions = personalTransactions.filter(t => t.from === person);
   const receivesTransactions = personalTransactions.filter(t => t.to === person);
 

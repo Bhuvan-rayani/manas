@@ -286,7 +286,13 @@ const App: React.FC = () => {
           </div>
         </div>
 
-        <Settlements balances={balances} tripId={trip.id} trackedSettlements={settlements} participants={trip.participants} trip={trip} />
+        <Settlements
+          expenses={expenses}
+          tripId={trip.id}
+          trackedSettlements={settlements}
+          participants={trip.participants}
+          trip={trip}
+        />
 
         <div className="mt-8">
           <div className="flex items-center justify-between mb-6">
@@ -345,6 +351,7 @@ const App: React.FC = () => {
           person={selectedPerson}
           balances={balances}
           expenses={expenses}
+          settlements={settlements}
           trip={trip}
           onClose={() => setSelectedPerson(null)}
         />

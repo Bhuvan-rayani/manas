@@ -1,24 +1,19 @@
 import React, { useMemo, useState } from 'react';
-import { Balance, Settlement, Trip } from '../types';
+import { Expense, Settlement, Trip } from '../types';
 import { AVATARS } from '../assets/avatars';
 import { createSettlement, deleteSettlement, setSettlementPaidStatus } from '../services/db';
 import { RupeeSymbol } from './CurrencyIcon';
+import { buildOutstandingTransactions, TransactionSuggestion } from '../services/settlements';
 
 interface SettlementsProps {
-  balances: Balance[];
   tripId: string;
   trackedSettlements: Settlement[];
   participants: string[];
   trip?: Trip;
+  expenses: Expense[];
 }
 
-interface TransactionSuggestion {
-  from: string;
-  to: string;
-  amount: number;
-}
-
-const Settlements: React.FC<SettlementsProps> = ({ balances, tripId, trackedSettlements, participants, trip }) => {
+const Settlements: React.FC<SettlementsProps> = ({ tripId, trackedSettlements, participants, trip, expenses }) => {
   const [creatingSettlement, setCreatingSettlement] = useState<string | null>(null);
   const [showCustomForm, setShowCustomForm] = useState(false);
   const [customFrom, setCustomFrom] = useState('');
@@ -28,30 +23,10 @@ const Settlements: React.FC<SettlementsProps> = ({ balances, tripId, trackedSett
   const [togglingPaid, setTogglingPaid] = useState<string | null>(null);
 
   // Compute minimal suggested transactions between debtors and creditors
+  // Build suggested settlements that pay the original payer of each expense, minus anything already recorded
   const suggestedSettlements = useMemo(() => {
-    const debtors = balances.filter(b => b.net < 0).map(b => ({ name: b.name, amount: Math.abs(b.net) }));
-    const creditors = balances.filter(b => b.net > 0).map(b => ({ name: b.name, amount: b.net }));
-    const txns: TransactionSuggestion[] = [];
-
-    let i = 0;
-    let j = 0;
-    while (i < debtors.length && j < creditors.length) {
-      const debtor = debtors[i];
-      const creditor = creditors[j];
-      const amount = Math.min(debtor.amount, creditor.amount);
-
-      if (amount > 0.01) {
-        txns.push({ from: debtor.name, to: creditor.name, amount });
-      }
-
-      debtor.amount -= amount;
-      creditor.amount -= amount;
-      if (debtor.amount < 0.01) i += 1;
-      if (creditor.amount < 0.01) j += 1;
-    }
-
-    return txns;
-  }, [balances]);
+    return buildOutstandingTransactions(expenses, trackedSettlements);
+  }, [expenses, trackedSettlements]);
 
   const unpaidSettlements = trackedSettlements.filter(s => !s.isPaid);
   const paidSettlements = trackedSettlements.filter(s => s.isPaid);
@@ -305,9 +280,6 @@ const Settlements: React.FC<SettlementsProps> = ({ balances, tripId, trackedSett
           <div className="space-y-3">
             {suggestedSettlements.map((txn, idx) => {
               const key = `${txn.from}-${txn.to}`;
-              const alreadyTracked = unpaidSettlements.some(s => s.from === txn.from && s.to === txn.to && Math.abs(s.amount - txn.amount) < 0.01);
-              if (alreadyTracked) return null;
-
               return (
                 <div key={key || idx} className="bg-gradient-to-r from-gray-900 to-gray-800 rounded-2xl p-5 border-2 border-[#f49221]/30 hover:border-[#f49221] transition-all hover:shadow-xl hover:shadow-[#f49221]/20">
                   <div className="flex items-center justify-between">

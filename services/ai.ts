@@ -11,7 +11,7 @@ export const getAIRecommendation = async (expenses: Expense[], balances: Balance
   const model = ai.getGenerativeModel({ model: 'gemini-pro' });
   
   const prompt = `
-    As a group expense assistant for an app called "Manas Split", analyze the following trip data and provide 2-3 short, logical recommendations for the group. 
+    As a group expense assistant for an app called "Manas", analyze the following trip data and provide 2-3 short, logical recommendations for the group. 
     Focus on fairness and who should pay next.
     
     Participants and Net Balances (Positive means they are owed, Negative means they owe):

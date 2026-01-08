@@ -1,6 +1,6 @@
 
 {
-  "name": "Manas Split",
+  "name": "Manas",
   "description": "A collaborative expense management tool for groups to split trip costs fairly using Firebase and React.",
   "requestFramePermissions": [
     "camera"

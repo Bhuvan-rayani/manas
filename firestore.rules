@@ -1,0 +1,34 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Allow anyone to read and write to trips
+    match /trips/{document=**} {
+      allow read, write: if true;
+    }
+    
+    // Allow anyone to read and write to expenses
+    match /expenses/{document=**} {
+      allow read, write: if true;
+    }
+    
+    // Allow anyone to read and write to settlements
+    match /settlements/{document=**} {
+      allow read, write: if true;
+    }
+    
+    // Allow anyone to read and write to users
+    match /users/{document=**} {
+      allow read, write: if true;
+    }
+    
+    // Allow anyone to read and write to PS boards and their products
+    match /ps_boards/{psId} {
+      allow read, write: if true;
+      
+      // Products subcollection under PS boards
+      match /products/{productId} {
+        allow read, write: if true;
+      }
+    }
+  }
+}

@@ -1,18 +1,20 @@
 
 import React, { useState } from 'react';
-import { createTrip } from '../services/db';
+import { createTrip, createTripWithId } from '../services/db';
 import { db } from '../firebase';
 import { collection, getDocs } from 'firebase/firestore';
 import { AVATARS } from '../assets/avatars';
 
 interface TripManagerProps {
   onTripSelected: (tripId: string) => void;
+  onBack?: () => void;
 }
 
-const TripManager: React.FC<TripManagerProps> = ({ onTripSelected }) => {
+const TripManager: React.FC<TripManagerProps> = ({ onTripSelected, onBack }) => {
   const [view, setView] = useState<'selection' | 'create' | 'join'>('selection');
   const [tripName, setTripName] = useState('');
   const [participants, setParticipants] = useState<string[]>(['', '']);
+  const [customId, setCustomId] = useState('');
   const [memberAvatars, setMemberAvatars] = useState<{ [name: string]: string }>({});
   const [showAvatarPicker, setShowAvatarPicker] = useState<string | null>(null);
   const [joinId, setJoinId] = useState('');
@@ -64,9 +66,11 @@ const TripManager: React.FC<TripManagerProps> = ({ onTripSelected }) => {
     }, 8000);
     
     try {
-      // Create trip with avatars
+      // Create trip with avatars (allow custom ID)
       console.log('🚀 Starting trip creation...');
-      const id = await createTrip(tripName, p, memberAvatars);
+      const id = customId.trim()
+        ? await createTripWithId(customId.trim(), tripName, p, memberAvatars)
+        : await createTrip(tripName, p, memberAvatars);
       clearTimeout(timeout);
       console.log("✅ Trip created successfully with ID:", id);
       onTripSelected(id);
@@ -106,6 +110,7 @@ const TripManager: React.FC<TripManagerProps> = ({ onTripSelected }) => {
           )}
           <form onSubmit={handleCreate} className="space-y-6">
             <input required className="w-full px-6 py-4 border-2 border-gray-100 rounded-2xl focus:border-[#f49221] outline-none font-bold text-black placeholder-gray-400" placeholder="Destination Name" value={tripName} onChange={e => setTripName(e.target.value)} />
+            <input className="w-full px-6 py-4 border-2 border-gray-100 rounded-2xl focus:border-[#f49221] outline-none font-bold text-black placeholder-gray-400" placeholder="Custom Trip ID (optional)" value={customId} onChange={e => setCustomId(e.target.value)} />
             <div className="space-y-3">
               <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest ml-1">Participants</label>
               {participants.map((p, i) => (
@@ -206,7 +211,7 @@ const TripManager: React.FC<TripManagerProps> = ({ onTripSelected }) => {
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
           </svg>
         </div>
-        <h1 className="text-5xl font-bold text-black mb-3 font-pt tracking-tighter uppercase">Manas Split</h1>
+        <h1 className="text-5xl font-bold text-black mb-3 font-pt tracking-tighter uppercase">Manas</h1>
         <p className="text-gray-400 font-bold uppercase tracking-[0.2em] text-[10px] mb-14">Simplified Group Finance</p>
         <div className="space-y-5">
           <button onClick={() => setView('create')} className="w-full py-6 bg-[#f49221] text-white rounded-2xl font-bold hover:scale-[1.02] transition-all shadow-2xl shadow-[#f49221]/30 flex items-center justify-center gap-3 uppercase tracking-widest">
@@ -215,6 +220,11 @@ const TripManager: React.FC<TripManagerProps> = ({ onTripSelected }) => {
           <button onClick={() => setView('join')} className="w-full py-6 bg-black text-white rounded-2xl font-bold hover:scale-[1.02] transition-all flex items-center justify-center gap-3 uppercase tracking-widest">
             Connect to Trip
           </button>
+          {onBack && (
+            <button onClick={onBack} className="w-full py-4 text-gray-400 hover:text-gray-600 rounded-2xl font-bold transition-all uppercase tracking-widest text-sm border-2 border-gray-200 hover:border-gray-300">
+              ← Back to Boards
+            </button>
+          )}
         </div>
       </div>
 

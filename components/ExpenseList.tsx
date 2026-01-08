@@ -3,14 +3,17 @@ import React, { useState } from 'react';
 import { Expense, Trip } from '../types';
 import { AVATARS } from '../assets/avatars';
 import { RupeeSymbol } from './CurrencyIcon';
+import ExpenseEditModal from './ExpenseEditModal';
 
 interface ExpenseListProps {
   expenses: Expense[];
   trip?: Trip;
+  participants?: string[];
 }
 
-const ExpenseList: React.FC<ExpenseListProps> = ({ expenses, trip }) => {
+const ExpenseList: React.FC<ExpenseListProps> = ({ expenses, trip, participants = [] }) => {
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  const [selectedExpenseForEdit, setSelectedExpenseForEdit] = useState<Expense | null>(null);
 
   const renderAvatar = (name: string) => {
     const avatarId = trip?.memberAvatars?.[name];
@@ -37,11 +40,14 @@ const ExpenseList: React.FC<ExpenseListProps> = ({ expenses, trip }) => {
                 <th className="px-6 py-5 font-bold uppercase tracking-wider text-xs">Paid By</th>
                 <th className="px-6 py-5 font-bold uppercase tracking-wider text-xs">Split</th>
                 <th className="px-6 py-5 font-bold uppercase tracking-wider text-xs">Proof</th>
+                <th className="px-6 py-5 font-bold uppercase tracking-wider text-xs">Action</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-white/5">
               {expenses.map(exp => (
                 <tr key={exp.id} className="hover:bg-white/10 transition-all border-l-4 border-transparent hover:border-[#f49221] backdrop-blur-sm group">
+                  <th className="px-6 py-5 font-bold uppercase tracking-wider text-xs">Proof</th>
+                  <th className="px-6 py-5 font-bold uppercase tracking-wider text-xs">Action</th>
                   <td className="px-6 py-5">
                     <div className="font-bold text-white text-base">{exp.title}</div>
                     <div className="text-xs text-gray-500 mt-1">{new Date(exp.createdAt).toLocaleDateString()}</div>
@@ -76,6 +82,14 @@ const ExpenseList: React.FC<ExpenseListProps> = ({ expenses, trip }) => {
                       <span className="text-gray-600 text-xs">No proof</span>
                     )}
                   </td>
+                  <td className="px-6 py-5">
+                    <button
+                      onClick={() => setSelectedExpenseForEdit(exp)}
+                      className="bg-[#f49221] hover:bg-[#e58515] text-white px-4 py-2 rounded-lg text-xs font-medium transition-colors"
+                    >
+                      Edit
+                    </button>
+                  </td>
                 </tr>
               ))}
             </tbody>
@@ -94,6 +108,18 @@ const ExpenseList: React.FC<ExpenseListProps> = ({ expenses, trip }) => {
             <img src={selectedImage} alt="Payment Proof" className="max-h-[80vh] object-contain rounded-3xl shadow-[0_0_100px_rgba(244,146,33,0.3)] border-4 border-white" />
           </div>
         </div>
+      )}
+
+      {selectedExpenseForEdit && (
+        <ExpenseEditModal
+          expense={selectedExpenseForEdit}
+          participants={participants}
+          trip={trip}
+          onClose={() => setSelectedExpenseForEdit(null)}
+          onUpdate={() => {
+            setSelectedExpenseForEdit(null);
+          }}
+        />
       )}
     </div>
   );

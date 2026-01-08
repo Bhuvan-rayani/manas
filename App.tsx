@@ -426,7 +426,7 @@ const App: React.FC = () => {
               <ExpenseList expenses={expenses} trip={trip} participants={trip.participants} />
             )}
           </div>
-        ) : activeTab === 'products' ? (
+        ) : mode === 'ps' && activeTab === 'products' ? (
           <div className="mt-8">
             <div className="flex items-center justify-between mb-6">
               <h3 className="text-2xl font-bold text-white flex items-center gap-3">
